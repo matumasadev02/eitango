@@ -1,0 +1,41 @@
+#words-container {
+  display: grid;
+}
+#words-container ul {
+  border: 2px solid var(--border);
+  padding: 0;
+  padding: 1rem;
+}
+#words-container li {
+  list-style: none;
+  padding: 0.8rem;
+  margin: 0;
+  position: relative;
+}
+#words-container li:nth-child(1):before {
+  border: solid 1px var(--border);
+  padding: 5px 10px;
+  margin-right: 10px;
+  content: "原型";
+}
+#words-container li:nth-child(2):before {
+  border: solid 1px var(--border);
+  padding: 5px 10px;
+  margin-right: 10px;
+  content: "過去形";
+}
+#words-container li:nth-child(3):before {
+  border: solid 1px var(--border);
+  padding: 5px 10px;
+  margin-right: 10px;
+  content: "過去分詞";
+}
+#words-container li:nth-child(4):before {
+  border: solid 1px var(--border);
+  padding: 5px 10px;
+  margin-right: 10px;
+  content: "意味";
+}
+.cover span {
+  background-color: var(--text-main);
+}
