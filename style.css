@@ -11,6 +11,9 @@
   padding: 0.8rem;
   margin: 0;
   position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
 }
 #words-container li:nth-child(1):before {
   border: solid 1px var(--border);
