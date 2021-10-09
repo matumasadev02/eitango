@@ -39,3 +39,6 @@
 .cover span {
   background-color: var(--text-main);
 }
+span {
+  font-size: 1.4rem;
+}
