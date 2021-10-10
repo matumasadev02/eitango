@@ -8,8 +8,10 @@ fetch(
     return json.words;
   })
   .then((words) => {
+    var wordsCount = 0;
     words.forEach((wordSet) => {
-      var newUlEl = document.createElement("ul"); // p要素作成
+      wordsCount += 1;
+      var newUlEl = document.createElement("ul");
       var newUl = document
         .getElementById("words-container")
         .appendChild(newUlEl);
@@ -22,5 +24,16 @@ fetch(
           this.classList.toggle("cover");
         });
       });
+      var checkBtnEl = document.createElement("button");
+      checkBtnEl.innerHTML = "覚えた！";
+      checkBtnEl.value = wordsCount;
+      var newBtn = newUl.appendChild(checkBtnEl);
+      newBtn.addEventListener("click", () => {
+        newUl.classList.add("hidden");
+      });
     });
+  })
+  .catch((e) => {
+    document.getElementById("words-container").innerHTML =
+      '<p>An error occurred.</p><p>Your browser may not support fetch. Please use <a href="https://google.com/chrome">Google Chome Browser</a>.</p>';
   });
