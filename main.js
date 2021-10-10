@@ -1,10 +1,11 @@
 fetch(
-  "https://script.google.com/macros/s/AKfycbzL6ucRKn-e-r1CSDF_vNRVZ_xNyXHUtshutYqTJvS1XBinp_CbuLv6mtaJZCLkPvbEbg/exec"
+  "https://script.google.com/macros/s/AKfycbz7FUJHpRaGSuWqaKREvfRFk3CoeDUkW0A4ApPrM9-CEhCtgknZV_HezARMS7qk-UmDvw/exec"
 )
   .then((res) => {
     return res.json();
   })
   .then((json) => {
+    document.getElementById("name").innerText = json.name;
     var wordsCount = 0;
     json.words.forEach((wordSet) => {
       wordsCount += 1; //何番目か
