@@ -15,34 +15,16 @@
   align-items: center;
   cursor: pointer;
 }
-#words-container li:nth-child(1):before {
-  border: solid 1px var(--border);
-  padding: 5px 10px;
-  margin-right: 10px;
-  content: "原型";
-}
-#words-container li:nth-child(2):before {
-  border: solid 1px var(--border);
-  padding: 5px 10px;
-  margin-right: 10px;
-  content: "過去形";
-}
-#words-container li:nth-child(3):before {
-  border: solid 1px var(--border);
-  padding: 5px 10px;
-  margin-right: 10px;
-  content: "過去分詞";
-}
-#words-container li:nth-child(4):before {
-  border: solid 1px var(--border);
-  padding: 5px 10px;
-  margin-right: 10px;
-  content: "意味";
-}
 #words-container button {
   margin: 0.8rem;
 }
-.cover span {
+#words-container ul span:nth-child(1) {
+  font-size: 1rem;
+  padding: 0.5rem;
+  border: solid 1px var(--border);
+  margin-right: 1rem;
+}
+.cover span:nth-child(2) {
   background-color: var(--text-main);
 }
 span {
