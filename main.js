@@ -70,3 +70,4 @@ function getWord(sheetId) {
         '<p>An error occurred.</p><p>Your browser may not support fetch. Please use <a href="https://google.com/chrome">Google Chome Browser</a>.</p>';
     });
 }
+window.onload = getSheetList()
