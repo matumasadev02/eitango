@@ -28,9 +28,9 @@ function getSheetList() {
       }
       hiddenUpdate();
     })
-    .catch((e) => {
+    .catch(e, function(e){
       document.getElementById("words-container").innerHTML =
-        '<p>An error occurred.</p><p>Your browser may not support fetch. Please use <a href="https://google.com/chrome">Google Chome Browser</a>.</p>';
+        '<p>An error occurred.</p><p>Your browser may not support fetch. Please use <a href="https://google.com/chrome">Google Chome Browser</a>.</p><p>error</p>:<code>' + e + '</code>';
     });
 }
 function clearWord() {
