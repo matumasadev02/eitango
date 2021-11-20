@@ -1,103 +1,117 @@
-function pushData(array, value) {
-  if (array.indexOf(value) === -1) {
-    array.push(value);
+let datas = {
+  sheetNames: [],
+}
+const apiUrl = "https://script.google.com/macros/s/AKfycbzgEkaLJS_lgki6GCRYOBsfmtGpyKPCsFKWyNuGhZLsY8HWg8TjhrsSNFohPN2ZbAXVLg/exec"
+async function returnJson(url) {
+  let res = await fetch(url);
+  let json = await res.json();
+  return json;
+}
+// get local hidden cards
+function getLocalHiddenCards() {
+  if (localStorage.getItem("hiddenCards")) {
+    let hiddenCards = localStorage.getItem("hiddenCards");
+    hiddenCards = JSON.parse(hiddenCards);
+    datas.hiddenCards = hiddenCards;
+  } else {
+    datas.hiddenCards = {};
+    cardsLength = datas.sheetNames.length;
+    for (let i = 0; i < cardsLength; i++) {
+      datas.hiddenCards[i] = [];
+    }
   }
-  return true;
+}
+// return button element
+function retrunBtn(value,text) {
+  let btn = document.createElement("button");
+  btn.setAttribute("value", value);
+  btn.innerHTML = text;
+  return btn;
+}
+// return wordset element
+function returnWordSet(group,word) {
+  let wordSet = document.createElement("ul");
+  wordSet.setAttribute("class","word-set");
+  let groupEl = document.createElement("li");
+  groupEl.innerHTML = group;
+  let wordEl = document.createElement("li");
+  wordEl.classList.add("cover");
+  wordEl.addEventListener("click",()=>{
+    wordEl.classList.toggle("cover");
+  })
+  wordEl.innerHTML = word;
+  wordSet.appendChild(groupEl);
+  wordSet.appendChild(wordEl);
+  return wordSet;
+}
+// rerurn card element
+function returnCard(){
+  let card = document.createElement("div");
+  card.setAttribute("class","card");
+  return card;
+}
+// clear cards-container
+function clearCards() {
+  let cardsContainer = document.getElementById("cards-container");
+  cardsContainer.innerHTML = "";
+}
+// update hidden cards
+function updateHiddenCards(sheetIndex) {
+  let hiddenCards = datas.hiddenCards[sheetIndex];
+  let cards = document.querySelectorAll(".card");
+  hiddenCards.forEach((hiddenCardIndex) => {
+    cards[hiddenCardIndex].classList.add("hidden");
+  });
+}
+async function showSheets() {
+  let res = await returnJson(apiUrl + "?action=getSheetNames");
+  datas.sheetNames = res.sheetNames;
+  datas.sheetNames.forEach((sheetName,index) => {
+    let btnEl = retrunBtn(index,sheetName);
+    btnEl.addEventListener("click", () => {
+      showSheet(index);
+    });
+    document.getElementById("sheet-list").appendChild(btnEl);
+  });
 }
 
-function getSheetList() {
-  fetch(
-    "https://script.google.com/macros/s/AKfycbxN6EBW6CNO7P6aIzmHulc6qGLKeNLVRLYHsww-abC_6W_f946m_1YR95LWeGsDpFXdxQ/exec?action=getSheetNames"
-  )
-    .then((res) => {
-      return res.json();
-    })
-    .then((json) => {
-      let sheetNames = json.sheetNames;
-      for (let sheetIndex = 0; sheetIndex < sheetNames.length; ++sheetIndex) {
-        let selectLink = document.createElement("button");
-        selectLink.value = sheetIndex;
-        selectLink.innerText = sheetNames[sheetIndex];
-        let newSelectLink = document
-          .getElementById("select")
-          .appendChild(selectLink);
-        newSelectLink.addEventListener("click", function () {
-          clearWord();
-          getWord(this.value);
-        });
-      }
-      hiddenUpdate();
-    })
-    .catch(e, function(e){
-      document.getElementById("words-container").innerHTML =
-        '<p>An error occurred.</p><p>Your browser may not support fetch. Please use <a href="https://google.com/chrome">Google Chome Browser</a>.</p><p>error:</p><code>' + e + '</code>';
+async function showSheet(index) {
+  clearCards();
+  let sheets = datas.sheets;
+  let currentSheet = sheets[index];
+  let sheetName = datas.sheetNames[index];
+  document.getElementById("sheet-name").innerHTML = sheetName;
+  let groups = currentSheet.groups[0];
+  let words = currentSheet.words;
+  words.forEach((wordList,cardIndex) => {
+    let card = returnCard();
+    wordList.forEach((word,wordIndex) => {
+      let wordSet = returnWordSet(groups[wordIndex],word);
+      card.appendChild(wordSet);
     });
-}
-function clearWord() {
-  document.getElementById("words-container").innerHTML = "";
-  hiddenWords = getHidden();
-}
-function getWord(sheetId) {
-  fetch(
-    `https://script.google.com/macros/s/AKfycbxN6EBW6CNO7P6aIzmHulc6qGLKeNLVRLYHsww-abC_6W_f946m_1YR95LWeGsDpFXdxQ/exec?action=getSheetById&sheetId=${sheetId}`
-  )
-    .then((res) => {
-      return res.json();
-    })
-    .then((json) => {
-      let words = json.words;
-      document.getElementById("name").innerText = json.name;
-      for (let wordIndex = 0; wordIndex < words.length; ++wordIndex) {
-        var newUlEl = document.createElement("ul"); //ulElを定義
-        var newUl = document
-          .getElementById("words-container")
-          .appendChild(newUlEl); //newUlを定義、ulをHTMLに作成
-        for (
-          let wordCount = 0;
-          wordCount < words[wordIndex].length;
-          ++wordCount
-        ) {
-          //wordSetからwordを取り出す
-          var newLiEl = document.createElement("li"); //liElを定義
-          var newLi = newUl.appendChild(newLiEl); //newLiを定義、liをHTMLに作成
-          newLi.className = "cover";
-          newLi.innerHTML = `<span>${json.groups[0][wordCount]}</span><span>${words[wordIndex][wordCount]}</span>`; //liの子要素spanにwordを格納
-          newLi.addEventListener("click", function () {
-            //addEventListenerでクリックを検出し、coverクラスをtoggle
-            this.classList.toggle("cover");
-          });
-        }
-        //checkBtnの実装
-        var checkBtnEl = document.createElement("button"); //checkBtnElを定義
-        checkBtnEl.innerHTML = "覚えた！"; //innerHTMLで内容を入れる
-        var newBtn = newUl.appendChild(checkBtnEl); //newBtnをHTMLに作成
-        newBtn.addEventListener("click", () => {
-          pushData(hiddenWords, wordIndex);
-          console.log(hiddenWords);
-          document
-            .getElementById("words-container")
-            .childNodes[wordIndex].classList.add("hidden");
-        });
+    let btn = retrunBtn(cardIndex,"覚えた!");
+    btn.addEventListener("click",()=>{
+      let sheetIndex = index;
+      if (! datas.hiddenCards[sheetIndex].includes(btn.value)) {
+        datas.hiddenCards[sheetIndex].push(btn.value);
       }
-    })
-    .catch((e) => {
-      document.getElementById("words-container").innerHTML =
-        '<p>An error occurred.</p><p>Your browser may not support fetch. Please use <a href="https://google.com/chrome">Google Chome Browser</a>.</p>';
+      localStorage.setItem("hiddenCards",JSON.stringify(datas.hiddenCards));
+      updateHiddenCards(sheetIndex);
     });
-}
-function getHidden() {
-  return [];
-}
-function hiddenUpdate() {
-  hiddenWords.forEach((hiddenword) => {
-    document
-      .getElementById("words-container")
-      .childNodes[hiddenword].classList.add("hidden");
+    card.appendChild(btn);
+    document.getElementById("cards-container").appendChild(card);
   });
-  document.cookie = `hiddenWords = ${hiddenWords}`;
+  updateHiddenCards(index);
 }
-let hiddenWords = getHidden();
-function main() {
-  getSheetList();
+function updateCards(currentSheet) {
+  let cards = document.querySelectorAll(".card");
 }
-window.onload = main();
+window.onload = async () => {
+  document.getElementById("reset-storage").addEventListener("click",()=>{
+    localStorage.clear();
+    location.reload();
+  })
+  datas.sheets = await returnJson(apiUrl + "?action=getAllSheets");
+  await showSheets();
+  getLocalHiddenCards();
+}

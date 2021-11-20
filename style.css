@@ -1,35 +1,48 @@
-#words-container {
-  display: grid;
-}
-#words-container ul {
-  border: 2px solid var(--border);
+* {
   padding: 0;
-  padding: 1rem;
-}
-#words-container li {
-  list-style: none;
-  padding: 0.8rem;
   margin: 0;
-  position: relative;
+}
+body {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+#sheet-name {
+  margin: 10px 0;
+}
+#cards-container .card {
+  border: 2px solid var(--border);
+  padding: 1rem;
+  margin: 1rem 0;
+  transition: 0.3s;
+}
+.card ul {
   display: flex;
-  align-items: center;
-  cursor: pointer;
 }
-#words-container button {
-  margin: 0.8rem;
+.card li:nth-child(1) {
+  border: 2px solid var(--border);
 }
-#words-container ul span:nth-child(1) {
-  font-size: 1rem;
-  padding: 0.5rem;
-  border: solid 1px var(--border);
-  margin-right: 1rem;
+.card li:nth-child(2) {
+  font-size: 1.2rem;
 }
-.cover span:nth-child(2) {
+.card li:nth-child(2).cover {
   background-color: var(--text-main);
 }
-span {
-  font-size: 1.4rem;
+.card li {
+  transition: 0.2s;
+  cursor: pointer;
+  list-style: none;
+  padding: 7px;
+  margin: 0.5rem;
 }
 .hidden {
   display: none;
+  transition: .2s;
+}
+.card button {
+  margin-left: 5px;
+}
+#reset-storage {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
 }
