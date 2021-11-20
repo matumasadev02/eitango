@@ -113,5 +113,6 @@ window.onload = async () => {
   })
   datas.sheets = await returnJson(apiUrl + "?action=getAllSheets");
   await showSheets();
+  document.getElementById("loading").classList.add("hidden");
   getLocalHiddenCards();
 }
