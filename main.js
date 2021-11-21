@@ -10,6 +10,8 @@ async function returnJson(url) {
   }
   catch(e) {
     document.getElementById("error").innerText = "An error occurred. Error:" + e;
+    document.getElementById("error").classList.remove("hidden");
+    document.getElementById("loading").classList.remove("hidden");
     console.log(e);
   }
 }

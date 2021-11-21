@@ -73,7 +73,7 @@ header {
   border: 2px solid var(--border);
   border-top-color: var(--text-main);
   animation: spin 1s linear infinite;
-  margin: 10px;
+  margin: 20px;
 }
 @keyframes spin {
   0% {
