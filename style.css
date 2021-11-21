@@ -12,6 +12,9 @@ header {
 #sheet-name {
   margin: 10px 0;
 }
+#cards-container {
+  min-height: 100vh;
+}
 .card {
   border: 2px solid var(--border);
   padding: 1rem;
