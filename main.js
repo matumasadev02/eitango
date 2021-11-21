@@ -106,7 +106,6 @@ async function showSheet(index) {
     });
     let btn = retrunBtn(cardIndex,"覚えた!");
     btn.addEventListener("click",()=>{
-      let sheetIndex = index;
       if (! datas.hiddenCards[sheetName].includes(btn.value)) {
         datas.hiddenCards[sheetName].push(btn.value);
       }
@@ -118,9 +117,7 @@ async function showSheet(index) {
   });
   updateHiddenCards(sheetName);
 }
-function updateCards(currentSheet) {
-  let cards = document.querySelectorAll(".card");
-}
+
 window.onload = async () => {
   document.getElementById("reset-storage").addEventListener("click",()=>{
     localStorage.clear();
