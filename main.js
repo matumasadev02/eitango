@@ -3,9 +3,15 @@ let datas = {
 }
 const apiUrl = "https://script.google.com/macros/s/AKfycbzgEkaLJS_lgki6GCRYOBsfmtGpyKPCsFKWyNuGhZLsY8HWg8TjhrsSNFohPN2ZbAXVLg/exec"
 async function returnJson(url) {
-  let res = await fetch(url);
-  let json = await res.json();
-  return json;
+  try {
+    let res = await fetch(url,{method:"GET"});
+    let json = await res.json();
+    return json;
+  }
+  catch(e) {
+    document.getElementById("error").innerText = "An error occurred. Error:" + e;
+    console.log(e);
+  }
 }
 // get local hidden cards
 function getLocalHiddenCards() {
@@ -17,7 +23,7 @@ function getLocalHiddenCards() {
     datas.hiddenCards = {};
     cardsLength = datas.sheetNames.length;
     for (let i = 0; i < cardsLength; i++) {
-      datas.hiddenCards[i] = [];
+      datas.hiddenCards[datas.sheetNames[i]] = [];
     }
   }
 }
@@ -56,10 +62,19 @@ function clearCards() {
   cardsContainer.innerHTML = "";
 }
 // update hidden cards
-function updateHiddenCards(sheetIndex) {
-  let hiddenCards = datas.hiddenCards[sheetIndex];
+function updateHiddenCards(sheetName) {
+  let hiddenCards = () => {
+    try {
+      let hiddenCards = datas.hiddenCards[sheetName];
+      return hiddenCards;
+    } catch(e) {
+      datas.hiddenCards[sheetName] = [];
+      let hiddenCards = datas.hiddenCards[sheetName];
+      return hiddenCards;
+    }
+  }
   let cards = document.querySelectorAll(".card");
-  hiddenCards.forEach((hiddenCardIndex) => {
+  hiddenCards().forEach((hiddenCardIndex) => {
     cards[hiddenCardIndex].classList.add("hidden");
   });
 }
@@ -92,16 +107,16 @@ async function showSheet(index) {
     let btn = retrunBtn(cardIndex,"覚えた!");
     btn.addEventListener("click",()=>{
       let sheetIndex = index;
-      if (! datas.hiddenCards[sheetIndex].includes(btn.value)) {
-        datas.hiddenCards[sheetIndex].push(btn.value);
+      if (! datas.hiddenCards[sheetName].includes(btn.value)) {
+        datas.hiddenCards[sheetName].push(btn.value);
       }
       localStorage.setItem("hiddenCards",JSON.stringify(datas.hiddenCards));
-      updateHiddenCards(sheetIndex);
+      updateHiddenCards(sheetName);
     });
     card.appendChild(btn);
     document.getElementById("cards-container").appendChild(card);
   });
-  updateHiddenCards(index);
+  updateHiddenCards(sheetName);
 }
 function updateCards(currentSheet) {
   let cards = document.querySelectorAll(".card");
@@ -110,7 +125,7 @@ window.onload = async () => {
   document.getElementById("reset-storage").addEventListener("click",()=>{
     localStorage.clear();
     location.reload();
-  })
+  });
   datas.sheets = await returnJson(apiUrl + "?action=getAllSheets");
   await showSheets();
   document.getElementById("loading").classList.add("hidden");
