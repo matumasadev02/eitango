@@ -136,8 +136,11 @@ async function showSheet(index) {
 
 window.onload = async () => {
   document.getElementById("reset-storage").addEventListener("click",()=>{
-    localStorage.clear();
-    location.reload();
+    if (confirm("保存されたデータを削除します。よろしいですか？")) {
+      localStorage.removeItem("hiddenCards");
+      localStorage.clear();
+      location.reload();
+    }
   });
   // data.sheets = await returnJson(apiUrl + "?action=getAllSheets");
   await showSheets();
