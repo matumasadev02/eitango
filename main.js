@@ -1,4 +1,4 @@
-let datas = {
+let data = {
   sheetNames: [],
 }
 const apiUrl = "https://script.google.com/macros/s/AKfycbzgEkaLJS_lgki6GCRYOBsfmtGpyKPCsFKWyNuGhZLsY8HWg8TjhrsSNFohPN2ZbAXVLg/exec"
@@ -18,12 +18,12 @@ function getLocalHiddenCards() {
   if (localStorage.getItem("hiddenCards")) {
     let hiddenCards = localStorage.getItem("hiddenCards");
     hiddenCards = JSON.parse(hiddenCards);
-    datas.hiddenCards = hiddenCards;
+    data.hiddenCards = hiddenCards;
   } else {
-    datas.hiddenCards = {};
-    cardsLength = datas.sheetNames.length;
+    data.hiddenCards = {};
+    cardsLength = data.sheetNames.length;
     for (let i = 0; i < cardsLength; i++) {
-      datas.hiddenCards[datas.sheetNames[i]] = [];
+      data.hiddenCards[data.sheetNames[i]] = [];
     }
   }
 }
@@ -65,11 +65,11 @@ function clearCards() {
 function updateHiddenCards(sheetName) {
   let hiddenCards = () => {
     try {
-      let hiddenCards = datas.hiddenCards[sheetName];
+      let hiddenCards = data.hiddenCards[sheetName];
       return hiddenCards;
     } catch(e) {
-      datas.hiddenCards[sheetName] = [];
-      let hiddenCards = datas.hiddenCards[sheetName];
+      data.hiddenCards[sheetName] = [];
+      let hiddenCards = data.hiddenCards[sheetName];
       return hiddenCards;
     }
   }
@@ -80,8 +80,8 @@ function updateHiddenCards(sheetName) {
 }
 async function showSheets() {
   let res = await returnJson(apiUrl + "?action=getSheetNames");
-  datas.sheetNames = res.sheetNames;
-  datas.sheetNames.forEach((sheetName,index) => {
+  data.sheetNames = res.sheetNames;
+  data.sheetNames.forEach((sheetName,index) => {
     let btnEl = retrunBtn(index,sheetName);
     btnEl.addEventListener("click", () => {
       showSheet(index);
@@ -92,9 +92,9 @@ async function showSheets() {
 
 async function showSheet(index) {
   clearCards();
-  let sheets = datas.sheets;
+  let sheets = data.sheets;
   let currentSheet = sheets[index];
-  let sheetName = datas.sheetNames[index];
+  let sheetName = data.sheetNames[index];
   document.getElementById("sheet-name").innerHTML = sheetName;
   let groups = currentSheet.groups[0];
   let words = currentSheet.words;
@@ -106,10 +106,10 @@ async function showSheet(index) {
     });
     let btn = retrunBtn(cardIndex,"覚えた!");
     btn.addEventListener("click",()=>{
-      if (! datas.hiddenCards[sheetName].includes(btn.value)) {
-        datas.hiddenCards[sheetName].push(btn.value);
+      if (! data.hiddenCards[sheetName].includes(btn.value)) {
+        data.hiddenCards[sheetName].push(btn.value);
       }
-      localStorage.setItem("hiddenCards",JSON.stringify(datas.hiddenCards));
+      localStorage.setItem("hiddenCards",JSON.stringify(data.hiddenCards));
       updateHiddenCards(sheetName);
     });
     card.appendChild(btn);
@@ -123,7 +123,7 @@ window.onload = async () => {
     localStorage.clear();
     location.reload();
   });
-  datas.sheets = await returnJson(apiUrl + "?action=getAllSheets");
+  data.sheets = await returnJson(apiUrl + "?action=getAllSheets");
   await showSheets();
   document.getElementById("loading").classList.add("hidden");
   getLocalHiddenCards();
