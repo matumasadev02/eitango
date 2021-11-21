@@ -73,7 +73,7 @@ header {
   width: 5rem;
   height: 5rem;
   border-radius: 50%;
-  border: 2px solid var(--border);
+  border: 5px solid var(--border);
   border-top-color: var(--text-main);
   animation: spin 1s linear infinite;
   margin: 20px;
