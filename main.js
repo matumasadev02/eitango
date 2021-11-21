@@ -1,5 +1,6 @@
 let data = {
   sheetNames: [],
+  sheets: {}
 }
 const apiUrl = "https://script.google.com/macros/s/AKfycbzgEkaLJS_lgki6GCRYOBsfmtGpyKPCsFKWyNuGhZLsY8HWg8TjhrsSNFohPN2ZbAXVLg/exec"
 async function returnJson(url) {
@@ -95,11 +96,24 @@ async function showSheets() {
 async function showSheet(index) {
   clearCards();
   let sheets = data.sheets;
-  let currentSheet = sheets[index];
+  async function returnCurrentSheet () {
+    if (sheets[data.sheetNames[index]]) {
+      let currentSheet = sheets[data.sheetNames[index]];
+      return currentSheet;
+    } else {
+      document.getElementById("loading").classList.remove("hidden");
+      let currentSheet = await returnJson(apiUrl + "?action=getSheetById&sheetId=" + index);
+      console.log(currentSheet)
+      data.sheets[data.sheetNames[index]] = currentSheet;
+      document.getElementById("loading").classList.add("hidden");
+      return currentSheet;
+    }
+  }
+  let currentSheet = await returnCurrentSheet();
   let sheetName = data.sheetNames[index];
   document.getElementById("sheet-name").innerHTML = sheetName;
-  let groups = currentSheet.groups[0];
-  let words = currentSheet.words;
+  let groups = await currentSheet.groups[0];
+  let words = await currentSheet.words;
   words.forEach((wordList,cardIndex) => {
     let card = returnCard();
     wordList.forEach((word,wordIndex) => {
@@ -125,7 +139,7 @@ window.onload = async () => {
     localStorage.clear();
     location.reload();
   });
-  data.sheets = await returnJson(apiUrl + "?action=getAllSheets");
+  // data.sheets = await returnJson(apiUrl + "?action=getAllSheets");
   await showSheets();
   document.getElementById("loading").classList.add("hidden");
   getLocalHiddenCards();
