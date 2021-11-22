@@ -1,21 +1,37 @@
 let data = {
   sheetNames: [],
-  sheets: {}
+  cards: {}
 }
 const apiUrl = "https://script.google.com/macros/s/AKfycbzgEkaLJS_lgki6GCRYOBsfmtGpyKPCsFKWyNuGhZLsY8HWg8TjhrsSNFohPN2ZbAXVLg/exec"
+
+//get json from url
 async function returnJson(url) {
   try {
-    let res = await fetch(url,{method:"GET"});
+    let res = await fetch(url, { method: "GET" });
     let json = await res.json();
     return json;
   }
-  catch(e) {
+  catch (e) {
     document.getElementById("error").innerText = "An error occurred. Error:" + e;
     document.getElementById("error").classList.remove("hidden");
     document.getElementById("loading").classList.remove("hidden");
     console.log(e);
   }
 }
+
+// show buttons for sheets
+async function showSheets() {
+  let res = await returnJson(apiUrl + "?action=getSheetNames");
+  data.sheetNames = res.sheetNames;
+  data.sheetNames.forEach((sheetName, sheetIndex) => {
+    let btnEl = retrunBtn(sheetIndex, sheetName);
+    btnEl.addEventListener("click", () => {
+      render(sheetIndex);
+    });
+    document.getElementById("sheet-list").appendChild(btnEl);
+  });
+}
+
 // get local hidden cards
 function getLocalHiddenCards() {
   if (localStorage.getItem("hiddenCards")) {
@@ -30,22 +46,34 @@ function getLocalHiddenCards() {
     }
   }
 }
+
+// set data.hiddenCards to localStorage
+function setHiddenCards() {
+  localStorage.setItem("hiddenCards", JSON.stringify(data.hiddenCards));
+}
+
+// clear cards-container
+function clearCards() {
+  let cardsContainer = document.getElementById("cards-container");
+  cardsContainer.innerHTML = "";
+}
+
 // return button element
-function retrunBtn(value,text) {
+function retrunBtn(value, text) {
   let btn = document.createElement("button");
   btn.setAttribute("value", value);
   btn.innerHTML = text;
   return btn;
 }
 // return wordset element
-function returnWordSet(group,word) {
+function returnWordSet(group, word) {
   let wordSet = document.createElement("ul");
-  wordSet.setAttribute("class","word-set");
+  wordSet.setAttribute("class", "word-set");
   let groupEl = document.createElement("li");
   groupEl.innerHTML = group;
   let wordEl = document.createElement("li");
   wordEl.classList.add("cover");
-  wordEl.addEventListener("click",()=>{
+  wordEl.addEventListener("click", () => {
     wordEl.classList.toggle("cover");
   })
   wordEl.innerHTML = word;
@@ -53,24 +81,14 @@ function returnWordSet(group,word) {
   wordSet.appendChild(wordEl);
   return wordSet;
 }
-// rerurn card element
-function returnCard(){
-  let card = document.createElement("div");
-  card.setAttribute("class","card");
-  return card;
-}
-// clear cards-container
-function clearCards() {
-  let cardsContainer = document.getElementById("cards-container");
-  cardsContainer.innerHTML = "";
-}
+
 // update hidden cards
 function updateHiddenCards(sheetName) {
   let hiddenCards = () => {
     try {
       let hiddenCards = data.hiddenCards[sheetName];
       return hiddenCards;
-    } catch(e) {
+    } catch (e) {
       data.hiddenCards[sheetName] = [];
       let hiddenCards = data.hiddenCards[sheetName];
       return hiddenCards;
@@ -81,68 +99,62 @@ function updateHiddenCards(sheetName) {
     cards[hiddenCardIndex].classList.add("hidden");
   });
 }
-async function showSheets() {
-  let res = await returnJson(apiUrl + "?action=getSheetNames");
-  data.sheetNames = res.sheetNames;
-  data.sheetNames.forEach((sheetName,index) => {
-    let btnEl = retrunBtn(index,sheetName);
-    btnEl.addEventListener("click", () => {
-      showSheet(index);
+
+// return card elements list
+async function getCards(sheetIndex) {
+  let currentSheetName = data.sheetNames[sheetIndex];
+  if (data.cards[data.sheetNames[sheetIndex]]) {
+    return data.cards[currentSheetName];
+  } else {
+    let currentSheet = await returnJson(apiUrl + "?action=getSheetById&sheetId=" + sheetIndex);
+    let groups = currentSheet.groups[0];
+    let wordSets = currentSheet.words;
+    let cardElenents = [];
+    wordSets.forEach((wordSet, cardIndex) => {
+      let cardEl = document.createElement("div");
+      cardEl.classList.add("card");
+      wordSet.forEach((word, wordIndex) => {
+        let wordSetEl = returnWordSet(groups[wordIndex], word);
+        cardEl.appendChild(wordSetEl);
+      });
+      let hiddenBtn = retrunBtn(cardIndex, "覚えた！");
+      cardEl.appendChild(hiddenBtn);
+      hiddenBtn.addEventListener("click", () => {
+        if (!data.hiddenCards[currentSheetName].includes(cardIndex)) {
+          data.hiddenCards[currentSheetName].push(cardIndex);
+        }
+        setHiddenCards();
+        updateHiddenCards(currentSheetName);
+      });
+      cardElenents.push(cardEl);
     });
-    document.getElementById("sheet-list").appendChild(btnEl);
-  });
+    data.cards[currentSheetName] = cardElenents;
+    return cardElenents;
+  }
 }
 
-async function showSheet(index) {
+// show cards
+async function render(sheetIndex) {
   clearCards();
-  let sheets = data.sheets;
-  async function returnCurrentSheet () {
-    if (sheets[data.sheetNames[index]]) {
-      let currentSheet = sheets[data.sheetNames[index]];
-      return currentSheet;
-    } else {
-      document.getElementById("loading").classList.remove("hidden");
-      let currentSheet = await returnJson(apiUrl + "?action=getSheetById&sheetId=" + index);
-      console.log(currentSheet)
-      data.sheets[data.sheetNames[index]] = currentSheet;
-      document.getElementById("loading").classList.add("hidden");
-      return currentSheet;
-    }
-  }
-  let currentSheet = await returnCurrentSheet();
-  let sheetName = data.sheetNames[index];
-  document.getElementById("sheet-name").innerHTML = sheetName;
-  let groups = await currentSheet.groups[0];
-  let words = await currentSheet.words;
-  words.forEach((wordList,cardIndex) => {
-    let card = returnCard();
-    wordList.forEach((word,wordIndex) => {
-      let wordSet = returnWordSet(groups[wordIndex],word);
-      card.appendChild(wordSet);
-    });
-    let btn = retrunBtn(cardIndex,"覚えた!");
-    btn.addEventListener("click",()=>{
-      if (! data.hiddenCards[sheetName].includes(btn.value)) {
-        data.hiddenCards[sheetName].push(btn.value);
-      }
-      localStorage.setItem("hiddenCards",JSON.stringify(data.hiddenCards));
-      updateHiddenCards(sheetName);
-    });
-    card.appendChild(btn);
+  document.getElementById("loading").classList.remove("hidden");
+  let cards = await getCards(sheetIndex).catch(e => {
+    document.getElementById("error").innerText = "An error occurred. Error:" + e;
+  });
+  cards.forEach(card => {
     document.getElementById("cards-container").appendChild(card);
   });
-  updateHiddenCards(sheetName);
+  updateHiddenCards(data.sheetNames[sheetIndex]);
+  document.getElementById("loading").classList.add("hidden");
 }
 
 window.onload = async () => {
-  document.getElementById("reset-storage").addEventListener("click",()=>{
+  document.getElementById("reset-storage").addEventListener("click", () => {
     if (confirm("保存されたデータを削除します。よろしいですか？")) {
       localStorage.removeItem("hiddenCards");
       localStorage.clear();
       location.reload();
     }
   });
-  // data.sheets = await returnJson(apiUrl + "?action=getAllSheets");
   await showSheets();
   document.getElementById("loading").classList.add("hidden");
   getLocalHiddenCards();
