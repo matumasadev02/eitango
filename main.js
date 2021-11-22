@@ -143,6 +143,7 @@ async function render(sheetIndex) {
   cards.forEach(card => {
     document.getElementById("cards-container").appendChild(card);
   });
+  document.getElementById("sheet-name").innerText = data.sheetNames[sheetIndex];
   updateHiddenCards(data.sheetNames[sheetIndex]);
   document.getElementById("loading").classList.add("hidden");
 }
