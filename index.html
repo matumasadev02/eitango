@@ -14,13 +14,28 @@
       <h1>EitanGO!</h1>
       <p>英単語を覚えよう！</p>
     </header>
-    <div id="sheet-list"></div>
-    <p id="sheet-name"></p>
-    <div id="cards-container"></div>
-    <button id="reset-storage">RESET</button>
+    <main>
+      <div id="sheet-list"></div>
+      <h2 id="sheet-name"></h2>
+      <div id="cards-container"></div>
+    </main>
     <footer>
       <small>&copy; <a href="https://github.com/matumasadev02">Matsuoka Masahiro</a></small>
     </footer>
+    <button id="menu-toggler">MENU</button>
+    <div class="hidden" id="popup">
+      <div>
+        <h2>MENU</h2>
+      </div>
+      <div id="popup-container">
+        <div id="popup-content">
+          <button id="export-data">データをエクスポート</button>
+          <button id="import-data">データをインポート</button>
+          <button id="clear-data">データを削除</button>
+        </div>
+        <button id="close-popup">閉じる</button>
+      </div>
+    </div>
     <script src="main.js"></script>
   </body>
 </html>

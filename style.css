@@ -40,14 +40,10 @@ header {
   padding: 7px;
   margin: 0.5rem;
 }
-.hidden {
-  display: none !important;
-  transition: .2s;
-}
 .card button {
   margin-left: 5px;
 }
-#reset-storage {
+#menu-toggler {
   position: fixed;
   bottom: 2rem;
   right: 2rem;
@@ -85,4 +81,27 @@ header {
   100% {
     transform: rotate(360deg);
   }
+}
+#popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: calc(100% - 2rem);
+  height: calc(100% - 2rem);
+  padding: 1rem;
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(2px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+#popup-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.hidden {
+  display: none !important;
 }

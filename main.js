@@ -149,14 +149,54 @@ async function render(sheetIndex) {
 }
 
 window.onload = async () => {
-  document.getElementById("reset-storage").addEventListener("click", () => {
-    if (confirm("保存されたデータを削除します。よろしいですか？")) {
-      localStorage.removeItem("hiddenCards");
+  document.getElementById("menu-toggler").addEventListener("click", () => {
+    document.getElementById("popup").classList.remove("hidden");
+  });
+  document.getElementById("close-popup").addEventListener("click", () => {
+    document.getElementById("popup").classList.add("hidden");
+  });
+  document.getElementById("clear-data").addEventListener("click", () => {
+    if (confirm("データを削除します。よろしいですか？")) {
       localStorage.clear();
       location.reload();
+    }
+  });
+  document.getElementById("export-data").addEventListener("click", () => {
+    try {
+      const data = localStorage.getItem("hiddenCards").toString();
+      console.log(data)
+      const fileName = "eitango.json";
+      const link = document.createElement("a");
+      link.href = "data:text/plain," + encodeURIComponent(data);
+      link.download = fileName;
+      link.click();
+    }
+    catch (e) {
+      alert(e)
+    }
+  });
+  document.getElementById("import-data").addEventListener("click", () => {
+    try {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.addEventListener("change", e => {
+        var result = e.target.files[0];
+        var reader = new FileReader();
+        reader.readAsText(result);
+        reader.addEventListener("load", () => {
+          data = JSON.parse(reader.result);
+          localStorage.setItem("hiddenCards", JSON.stringify(data));
+          alert("インポート完了！")
+        });
+        location.reload()
+      });
+      input.click();
+    }
+    catch (e) {
+      alert(e)
     }
   });
   await showSheets();
   document.getElementById("loading").classList.add("hidden");
   getLocalHiddenCards();
-}
+};
