@@ -167,7 +167,7 @@ window.onload = async () => {
       console.log(data)
       const fileName = "eitango.json";
       const link = document.createElement("a");
-      link.href = "data:text/plain," + encodeURIComponent(data);
+      link.href = "data:application/json," + encodeURIComponent(data);
       link.download = fileName;
       link.click();
     }
